@@ -30,6 +30,79 @@ public class SanitizerProcessorUtil {
 	public static byte[] process(
 			String key, String[] sanitizerClassNames, long companyId,
 			long groupId, long userId, String className, long classPK,
+			String contentType, byte[] bytes)
+		throws SanitizerException {
+
+		return process(
+			key, sanitizerClassNames, companyId, groupId, userId, className,
+			classPK, contentType, Sanitizer.MODE_ALL, bytes, null);
+	}
+
+	public static void process(
+			String key, String[] sanitizerClassNames, long companyId,
+			long groupId, long userId, String className, long classPK,
+			String contentType, InputStream inputStream,
+			OutputStream outputStream)
+		throws SanitizerException {
+
+		process(
+			key, sanitizerClassNames, companyId, groupId, userId, className,
+			classPK, contentType, Sanitizer.MODE_ALL, inputStream, outputStream,
+			null);
+	}
+
+	public static String process(
+			String key, String[] sanitizerClassNames, long companyId,
+			long groupId, long userId, String className, long classPK,
+			String contentType, String s)
+		throws SanitizerException {
+
+		return process(
+			key, sanitizerClassNames, companyId, groupId, userId, className,
+			classPK, contentType, Sanitizer.MODE_ALL, s, null);
+	}
+
+	public static byte[] process(
+			String key, String[] sanitizerClassNames, long companyId,
+			long groupId, long userId, String className, long classPK,
+			String contentType, String mode, byte[] bytes,
+			Map<String, Object> options)
+		throws SanitizerException {
+
+		return process(
+			key, sanitizerClassNames, companyId, groupId, userId, className,
+			classPK, contentType, new String[] {mode}, bytes, options);
+	}
+
+	public static void process(
+			String key, String[] sanitizerClassNames, long companyId,
+			long groupId, long userId, String className, long classPK,
+			String contentType, String mode, InputStream inputStream,
+			OutputStream outputStream, Map<String, Object> options)
+		throws SanitizerException {
+
+		process(
+			key, sanitizerClassNames, companyId, groupId, userId, className,
+			classPK, contentType, new String[] {mode}, inputStream,
+			outputStream, options);
+	}
+
+	public static String process(
+			String key, String[] sanitizerClassNames, long companyId,
+			long groupId, long userId, String className, long classPK,
+			String contentType, String mode, String s,
+			Map<String, Object> options)
+		throws SanitizerException {
+
+		return process(
+			key, sanitizerClassNames, companyId, groupId, userId, className,
+			classPK, contentType, new String[] {mode},
+			s, options);
+	}
+
+	public static byte[] process(
+			String key, String[] sanitizerClassNames, long companyId,
+			long groupId, long userId, String className, long classPK,
 			String contentType, String[] modes, byte[] bytes,
 			Map<String, Object> options)
 		throws SanitizerException {
@@ -61,6 +134,37 @@ public class SanitizerProcessorUtil {
 		return _instance.process(
 			key, sanitizerClassNames, companyId, groupId, userId, className,
 			classPK, contentType, modes, s, options);
+	}
+
+	public static byte[] process(
+			String key, String[] sanitizerClassNames, String className,
+			long classPK, String contentType, byte[] bytes)
+		throws SanitizerException {
+
+		return process(
+			key, sanitizerClassNames, 0L, 0L, 0L, className, classPK,
+			contentType, Sanitizer.MODE_ALL, bytes, null);
+	}
+
+	public static void process(
+			String key, String[] sanitizerClassNames, String className,
+			long classPK, String contentType, InputStream inputStream,
+			OutputStream outputStream)
+		throws SanitizerException {
+
+		process(
+			key, sanitizerClassNames, 0L, 0L, 0L, className, classPK,
+			contentType, Sanitizer.MODE_ALL, inputStream, outputStream, null);
+	}
+
+	public static String process(
+			String key, String[] sanitizerClassNames, String className,
+			long classPK, String contentType, String s)
+		throws SanitizerException {
+
+		return process(
+			key, sanitizerClassNames, 0L, 0L, 0L, className, classPK,
+			contentType, Sanitizer.MODE_ALL, s, null);
 	}
 
 	public static void registerSanitizer(String key, Sanitizer sanitizer) {

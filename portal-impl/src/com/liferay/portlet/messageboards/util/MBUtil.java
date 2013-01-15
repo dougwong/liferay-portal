@@ -245,9 +245,9 @@ public class MBUtil {
 			else if (partContent instanceof String) {
 				String messageBody = SanitizerProcessorUtil.process(
 					PropsKeys.MESSAGE_BOARDS_EMAIL_REPLY_SANITIZERS,
-					PropsValues.MESSAGE_BOARDS_EMAIL_REPLY_SANITIZERS, 0L, 0L,
-					0L, MBMessage.class.getName(), 0L, contentType, null,
-					(String)partContent, null);
+					PropsValues.MESSAGE_BOARDS_EMAIL_REPLY_SANITIZERS,
+					MBMessage.class.getName(), 0L, contentType,
+					(String)partContent);
 
 				if (contentType.startsWith("text/html")) {
 					mbMailMessage.setHtmlBody(messageBody);

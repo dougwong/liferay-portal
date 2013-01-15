@@ -46,8 +46,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
-import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
-import com.liferay.portal.kernel.sanitizer.SanitizerWrapper;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerPostProcessor;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
@@ -440,7 +438,9 @@ public class HookHotDeployListener
 			SanitizerContainer sanitizerContainer =
 				_sanitizerContainerMap.remove(servletContextName);
 
-			sanitizerContainer.unregisterSanitizers();
+			if (sanitizerContainer != null) {
+				sanitizerContainer.unregisterSanitizers();
+			}
 		}
 
 		if (portalProperties.containsKey(PropsKeys.PASSWORDS_TOOLKIT)) {
@@ -459,10 +459,12 @@ public class HookHotDeployListener
 		}
 
 		if (portalProperties.containsKey(PropsKeys.SANITIZER_IMPL)) {
-			SanitizerWrapper sanitizerWrapper =
-				(SanitizerWrapper)SanitizerUtil.getSanitizer();
+			SanitizerContainer sanitizerContainer =
+				_sanitizerContainerMap.remove(servletContextName);
 
-			sanitizerWrapper.setSanitizer(null);
+			if (sanitizerContainer != null) {
+				sanitizerContainer.unregisterSanitizers();
+			}
 		}
 
 		if (portalProperties.containsKey(
@@ -1887,16 +1889,20 @@ public class HookHotDeployListener
 		}
 
 		if (portalProperties.containsKey(PropsKeys.SANITIZER_IMPL)) {
-			String sanitizerClassName = portalProperties.getProperty(
-				PropsKeys.SANITIZER_IMPL);
+			String[] sanitizerClassNames = StringUtil.split(
+				portalProperties.getProperty(PropsKeys.SANITIZER_IMPL));
 
-			Sanitizer sanitizer = (Sanitizer)newInstance(
-				portletClassLoader, Sanitizer.class, sanitizerClassName);
+			SanitizerContainer sanitizerContainer = new SanitizerContainer();
 
-			SanitizerWrapper sanitizerWrapper =
-				(SanitizerWrapper)SanitizerUtil.getSanitizer();
+			_sanitizerContainerMap.put(servletContextName, sanitizerContainer);
 
-			sanitizerWrapper.setSanitizer(sanitizer);
+			for (String sanitizerClassName : sanitizerClassNames) {
+				Sanitizer sanitizer = (Sanitizer)newInstance(
+					portletClassLoader, Sanitizer.class, sanitizerClassName);
+
+				sanitizerContainer.registerSanitizer(
+					PropsKeys.SANITIZER_IMPL, sanitizer);
+			}
 		}
 
 		if (portalProperties.containsKey(
