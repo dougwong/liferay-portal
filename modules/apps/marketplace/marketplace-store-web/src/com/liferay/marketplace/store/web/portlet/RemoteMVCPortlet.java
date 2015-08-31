@@ -67,14 +67,14 @@ public class RemoteMVCPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		PortletSession portletSession = actionRequest.getPortletSession();
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		OAuthService oAuthService = oAuthManager.getOAuthService();
 
 		Token requestToken = oAuthService.getRequestToken();
 
-		portletSession.setAttribute(
-			MarketplaceStoreWebKeys.OAUTH_REQUEST_TOKEN, requestToken);
+		oAuthManager.updateRequestToken(themeDisplay.getUser(), requestToken);
 
 		String redirect = oAuthService.getAuthorizationUrl(requestToken);
 
@@ -324,10 +324,8 @@ public class RemoteMVCPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		PortletSession portletSession = renderRequest.getPortletSession();
-
-		Token requestToken = (Token)portletSession.getAttribute(
-			MarketplaceStoreWebKeys.OAUTH_REQUEST_TOKEN);
+		Token requestToken = oAuthManager.getRequestToken(
+			themeDisplay.getUser());
 
 		OAuthService oAuthService = oAuthManager.getOAuthService();
 
@@ -336,8 +334,7 @@ public class RemoteMVCPortlet extends MVCPortlet {
 
 		oAuthManager.updateAccessToken(themeDisplay.getUser(), accessToken);
 
-		portletSession.removeAttribute(
-			MarketplaceStoreWebKeys.OAUTH_REQUEST_TOKEN);
+		oAuthManager.deleteRequestToken(themeDisplay.getUser());
 	}
 
 	protected OAuthManager oAuthManager;
