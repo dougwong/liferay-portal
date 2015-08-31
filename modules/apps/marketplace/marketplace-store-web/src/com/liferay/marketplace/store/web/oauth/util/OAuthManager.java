@@ -90,7 +90,49 @@ public class OAuthManager {
 	public void updateAccessToken(User user, Token token)
 		throws PortalException {
 
-		_updateAccessToken(user, token);
+		_expandoValueLocalService.addValue(
+			user.getCompanyId(), User.class.getName(), "MP", "secret",
+			user.getUserId(), token.getSecret());
+		_expandoValueLocalService.addValue(
+			user.getCompanyId(), User.class.getName(), "MP", "token",
+			user.getUserId(), token.getToken());
+	}
+
+	public void deleteRequestToken(User user) throws PortalException {
+		_expandoValueLocalService.deleteValue(
+			user.getCompanyId(), User.class.getName(), "MP", "rsecret",
+			user.getUserId());
+		_expandoValueLocalService.deleteValue(
+			user.getCompanyId(), User.class.getName(), "MP", "rtoken",
+			user.getUserId());
+	}
+
+	public Token getRequestToken(User user) throws PortalException {
+		ExpandoValue secretExpandoValue = _expandoValueLocalService.getValue(
+			user.getCompanyId(), User.class.getName(), "MP", "rsecret",
+			user.getUserId());
+		ExpandoValue tokenExpandoValue = _expandoValueLocalService.getValue(
+			user.getCompanyId(), User.class.getName(), "MP", "rtoken",
+			user.getUserId());
+
+		if ((secretExpandoValue == null) || (tokenExpandoValue == null)) {
+			return null;
+		}
+
+		return new Token(
+			tokenExpandoValue.getString(), secretExpandoValue.getString());
+	}
+
+
+	public void updateRequestToken(User user, Token token)
+		throws PortalException {
+
+		_expandoValueLocalService.addValue(
+			user.getCompanyId(), User.class.getName(), "MP", "rsecret",
+			user.getUserId(), token.getSecret());
+		_expandoValueLocalService.addValue(
+			user.getCompanyId(), User.class.getName(), "MP", "rtoken",
+			user.getUserId(), token.getToken());
 	}
 
 	@Activate
@@ -164,17 +206,15 @@ public class OAuthManager {
 		}
 		catch (DuplicateColumnNameException dcne) {
 		}
-	}
 
-	private void _updateAccessToken(User user, Token token)
-		throws PortalException {
-
-		_expandoValueLocalService.addValue(
-			user.getCompanyId(), User.class.getName(), "MP", "secret",
-			user.getUserId(), token.getSecret());
-		_expandoValueLocalService.addValue(
-			user.getCompanyId(), User.class.getName(), "MP", "token",
-			user.getUserId(), token.getToken());
+		try {
+			_expandoColumnLocalService.addColumn(
+				table.getTableId(), "rsecret", ExpandoColumnConstants.STRING);
+			_expandoColumnLocalService.addColumn(
+				table.getTableId(), "rtoken", ExpandoColumnConstants.STRING);
+		}
+		catch (DuplicateColumnNameException dcne) {
+		}
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(OAuthManager.class);
