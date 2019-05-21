@@ -168,7 +168,7 @@ AUI.add(
 					_positionMenu: function() {
 						var instance = this;
 
-						if (instance.items.size() > 0) {
+						if (instance.items.size()) {
 							var Util = Liferay.Util;
 
 							var align = {
